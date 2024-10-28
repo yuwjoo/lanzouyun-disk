@@ -43,13 +43,14 @@ export default function SplitPage() {
     [form]
   )
   const updateInfo = useCallback(
-    debounce(() => {
-      const values = form.getFieldsValue()
-      if (file && values.ext && values.name) {
-        const task = splitTask({file, splitSize: `${values.size}m`, suffix: values.ext, filename: values.name})
-        setSplitInfo(task)
-      }
-    }, 500),
+    () =>
+      debounce(() => {
+        const values = form.getFieldsValue()
+        if (file && values.ext && values.name) {
+          const task = splitTask({file, splitSize: `${values.size}m`, suffix: values.ext, filename: values.name})
+          setSplitInfo(task)
+        }
+      }, 500),
     [file, form]
   )
 

@@ -24,7 +24,7 @@ export function sizeToByte(size: string, step = 1024) {
         return this.g * step
       },
     }[unit] || 1) // todo: 1 是有问题的
-  const [_, num, unit] = size
+  const [, num, unit] = size
     .toLowerCase()
     .replaceAll(' ', '')
     .replaceAll(',', '')

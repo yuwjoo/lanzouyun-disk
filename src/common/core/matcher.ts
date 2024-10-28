@@ -165,7 +165,7 @@ export class Matcher {
     const elValue = fn.match(/\((.+)\)/)?.[1]
     return this.parseAjaxData(
       $,
-      _ => `var ${elKey} = ${elValue};`,
+      () => `var ${elKey} = ${elValue};`,
       script => script.match(/\$\.ajax\(({[\s\S]+})\);/)?.[1]
     )
   }
@@ -176,7 +176,7 @@ export class Matcher {
   static parseFileMoreAjax(html: string) {
     return this.parseAjaxData(
       html,
-      _ => `var pgs = 1; var folder_id = '';`,
+      () => `var pgs = 1; var folder_id = '';`,
       script => script.replace(/\$\.each\([\s\S]+?}\);/g, '').match(/\$\.ajax\(({[\s\S]+?})\);/)?.[1]
     )
   }

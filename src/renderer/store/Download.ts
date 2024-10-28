@@ -65,6 +65,7 @@ export class Download extends EventEmitter implements Task<DownloadTask> {
       finish.downloadList.push(info)
     })
     this.on('finish-task', async (task, subTask) => {
+      console.log(subTask)
       if (task.tasks.every(item => item.status === TaskStatus.finish)) {
         await delay(200)
         await task.finishTask()
@@ -107,6 +108,7 @@ export class Download extends EventEmitter implements Task<DownloadTask> {
   }
 
   canStart(task: DownloadTask) {
+    console.log(task)
     return this.queue < config.downloadMax // && info.status !== InitStatus.pending
   }
 

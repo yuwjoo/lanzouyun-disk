@@ -1,3 +1,8 @@
-interface Window {
-  skipCheck: boolean
+import type {api} from 'src/main/preload'
+
+declare global {
+  interface Window {
+    skipCheck: boolean
+    api: typeof api
+  }
 }

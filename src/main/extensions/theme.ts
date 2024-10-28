@@ -12,6 +12,7 @@ export class ThemeExtension implements Extension {
   }
 
   getTheme = async (event: Electron.IpcMainInvokeEvent) => {
+    console.log(event)
     return {
       themeSource: nativeTheme.themeSource,
       shouldUseDarkColors: nativeTheme.shouldUseDarkColors,
@@ -22,6 +23,7 @@ export class ThemeExtension implements Extension {
   }
 
   install(instance: Application): void {
+    console.log(instance)
     ipcMain.handle(IpcEvent['theme:setTheme'], this.setTheme)
     ipcMain.handle(IpcEvent['theme:getTheme'], this.getTheme)
   }

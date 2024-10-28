@@ -18,7 +18,9 @@ export abstract class Application {
   private activate() {}
 
   // 窗口创建事件（未加载 URL，需要自己手动加载）
-  windowReady(win: BrowserWindow) {}
+  windowReady(win: BrowserWindow) {
+    console.log(win)
+  }
 
   /**
    * 窗口关闭事件
@@ -27,9 +29,13 @@ export abstract class Application {
   private closed() {}
 
   // 登录后触发该事件(已设置 cookie)
-  onLogin(win: BrowserWindow, detail: Electron.OnResponseStartedListenerDetails) {}
+  onLogin(win: BrowserWindow, detail: Electron.OnResponseStartedListenerDetails) {
+    console.log(win, detail)
+  }
   // 登出后触发该事件(已删除 cookie)
-  onLogout(win: BrowserWindow) {}
+  onLogout(win: BrowserWindow) {
+    console.log(win)
+  }
 
   // 阻止左上角关闭事件，但可使用 cmd+Q、推盘右键退出、菜单栏 Quit 退出！
   private closeable = false

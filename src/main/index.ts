@@ -34,7 +34,7 @@ class App extends Application {
     }
   }
 
-  async onLogin(win, detail) {
+  async onLogin(win: Electron.BrowserWindow) {
     await this.loadMain(win)
   }
 
