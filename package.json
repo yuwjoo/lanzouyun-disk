@@ -22,10 +22,11 @@
     "eject": "react-scripts eject",
     "tsc-electron-build": "tsc -p tsconfig.electron.json",
     "postinstall": "electron-builder install-app-deps && cd app && yarn",
-    "lint": "eslint --fix ./src"
+    "lint": "eslint --fix src/**/*.{ts,tsx,js,jsx}"
   },
   "dependencies": {
     "antd": "^4.20.2",
+    "caniuse-lite": "^1.0.30001673",
     "cheerio": "^1.0.0-rc.12",
     "darkreader": "^4.9.46",
     "electron-is-dev": "^2.0.0",

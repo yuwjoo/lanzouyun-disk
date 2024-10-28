@@ -11,7 +11,7 @@
   "scripts": {
     "start": "electron .",
     "debug": "electron --inspect-brk=8889 .",
-    "build": "electron-builder -mw"
+    "build": "electron-builder -w"
   },
   "keywords": [],
   "license": "ISC",
