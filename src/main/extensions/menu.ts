@@ -1,4 +1,4 @@
-import {Extension} from './extension'
+import { Extension } from "./extension";
 // import {Menu} from 'electron'
 
 export class MenuExtension implements Extension {

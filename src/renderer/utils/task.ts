@@ -3,6 +3,6 @@
  * @param tasks
  */
 export function taskLength<T>(tasks: T[]) {
-  const len = tasks?.length
-  return len ? `（${len}）` : ''
+  const len = tasks?.length;
+  return len ? `（${len}）` : "";
 }

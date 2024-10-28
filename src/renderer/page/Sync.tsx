@@ -1,13 +1,13 @@
-import React from 'react'
-import {Observer, observer} from 'mobx-react'
-import {MyScrollView} from '../component/ScrollView'
-import {Button, Space, Table, Tag} from 'antd'
-import {sync} from '../store/Sync'
-import {SyncOutlined} from '@ant-design/icons'
-import {MyIcon} from '../component/Icon'
-import path from 'path'
-import {TaskStatus} from '../store/AbstractTask'
-import {MyHeader} from '../component/Header'
+import React from "react";
+import { Observer, observer } from "mobx-react";
+import { MyScrollView } from "../component/ScrollView";
+import { Button, Space, Table, Tag } from "antd";
+import { sync } from "../store/Sync";
+import { SyncOutlined } from "@ant-design/icons";
+import { MyIcon } from "../component/Icon";
+import path from "path";
+import { TaskStatus } from "../store/AbstractTask";
+import { MyHeader } from "../component/Header";
 
 const Sync = observer(() => {
   return (
@@ -24,41 +24,41 @@ const Sync = observer(() => {
     >
       <Table
         pagination={false}
-        size={'small'}
-        rowKey={'uid'}
+        size={"small"}
+        rowKey={"uid"}
         dataSource={[...sync.list]}
         columns={[
           {
-            title: '文件名',
+            title: "文件名",
             render: (_, record) => {
               return (
                 <Observer>
                   {() => {
-                    const name = record.download.name
+                    const name = record.download.name;
 
                     if (!name) {
                       return (
                         <>
-                          <MyIcon iconName={'file'} />
+                          <MyIcon iconName={"file"} />
                           <span>未知</span>
                         </>
-                      )
+                      );
                     }
 
-                    const extname = path.extname(name).replace(/^\./, '')
+                    const extname = path.extname(name).replace(/^\./, "");
                     return (
                       <>
-                        <MyIcon iconName={extname} defaultIcon={'file'} />
+                        <MyIcon iconName={extname} defaultIcon={"file"} />
                         <span title={record.download.dir}>{name}</span>
                       </>
-                    )
+                    );
                   }}
                 </Observer>
-              )
+              );
             },
           },
           {
-            title: '状态',
+            title: "状态",
             width: 150,
             render: (_, record) => {
               return (
@@ -66,17 +66,17 @@ const Sync = observer(() => {
                   {() => {
                     return (
                       <>
-                        <Tag {...tagProps(record.step === 'download', record.download?.status)}>下载</Tag>
-                        <Tag {...tagProps(record.step === 'upload', record.upload?.status)}>上传</Tag>
+                        <Tag {...tagProps(record.step === "download", record.download?.status)}>下载</Tag>
+                        <Tag {...tagProps(record.step === "upload", record.upload?.status)}>上传</Tag>
                       </>
-                    )
+                    );
                   }}
                 </Observer>
-              )
+              );
             },
           },
           {
-            title: '操作',
+            title: "操作",
             width: 120,
             render: (_, record) => (
               <Observer>
@@ -101,9 +101,9 @@ const Sync = observer(() => {
                       }}
                     />*/}
                     <Button
-                      size={'small'}
-                      type={'text'}
-                      icon={<MyIcon iconName={'delete'} />}
+                      size={"small"}
+                      type={"text"}
+                      icon={<MyIcon iconName={"delete"} />}
                       onClick={() => sync.remove(record.uid)}
                     />
                   </>
@@ -114,14 +114,14 @@ const Sync = observer(() => {
         ]}
       />
     </MyScrollView>
-  )
-})
+  );
+});
 
-export default Sync
+export default Sync;
 
 function tagProps(showIcon: boolean, status: TaskStatus) {
   return {
     icon: showIcon ? <SyncOutlined spin={status === TaskStatus.pending} /> : undefined,
-    color: status === TaskStatus.finish ? 'success' : status === TaskStatus.pending ? 'processing' : 'default',
-  }
+    color: status === TaskStatus.finish ? "success" : status === TaskStatus.pending ? "processing" : "default",
+  };
 }

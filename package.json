@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "antd": "^4.20.2",
+    "axios": "^1.7.7",
     "caniuse-lite": "^1.0.30001673",
     "cheerio": "^1.0.0-rc.12",
     "darkreader": "^4.9.46",

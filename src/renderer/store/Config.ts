@@ -1,48 +1,48 @@
-import {makeAutoObservable} from 'mobx'
-import {persist} from 'mobx-persist'
+import { makeAutoObservable } from "mobx";
+import { persist } from "mobx-persist";
 
-type BaseProps<T> = Partial<Pick<T, {[P in keyof T]: T[P] extends (...args: any) => any ? never : P}[keyof T]>>
+type BaseProps<T> = Partial<Pick<T, { [P in keyof T]: T[P] extends (...args: any) => any ? never : P }[keyof T]>>;
 
 export class Config {
-  @persist domain = '' // https://wwn.lanzouf.com
-  @persist referer = ''
-  @persist lastLogin = '' // "2022-04-23 21:03:29"
+  @persist domain = ""; // https://wwn.lanzouf.com
+  @persist referer = "";
+  @persist lastLogin = ""; // "2022-04-23 21:03:29"
   // @persist('list') supportList: string[] = [] // ['tar']
-  @persist verification = '' // 188****8888
-  @persist maxSize = '100m' // Math.floor(100000000 / 1024 / 1024) // 100M
-  splitSize = '100m'
+  @persist verification = ""; // 188****8888
+  @persist maxSize = "100m"; // Math.floor(100000000 / 1024 / 1024) // 100M
+  splitSize = "100m";
 
   // 是否默认此地址为下载路径
-  @persist setDefaultDownloadDir = false
+  @persist setDefaultDownloadDir = false;
   // 文件下载位置
-  @persist downloadDir = ''
+  @persist downloadDir = "";
 
   // 主题
-  @persist themeSource: Electron.NativeTheme['themeSource']
+  @persist themeSource: Electron.NativeTheme["themeSource"];
 
   // 同时上传/下载数量
-  @persist uploadMax = 1
-  @persist downloadMax = 2
+  @persist uploadMax = 1;
+  @persist downloadMax = 2;
 
   // 上传流量警戒线
-  @persist uploadWarningSize = 7 // 单位 G
-  @persist uploadWarningEnabled = true
+  @persist uploadWarningSize = 7; // 单位 G
+  @persist uploadWarningEnabled = true;
 
-  @persist('object') more = {
-    url: '',
-    data: {vei: ''},
-  }
+  @persist("object") more = {
+    url: "",
+    data: { vei: "" },
+  };
 
   constructor() {
-    makeAutoObservable(this)
+    makeAutoObservable(this);
   }
 
   // update 过滤空项
   update(data: BaseProps<Config>) {
     // delete data.maxSize
-    data = Object.keys(data).reduce((prev, key) => (data[key] ? {...prev, [key]: data[key]} : prev), {})
+    data = Object.keys(data).reduce((prev, key) => (data[key] ? { ...prev, [key]: data[key] } : prev), {});
     if (Object.keys(data).length) {
-      Object.assign(this, data)
+      Object.assign(this, data);
     }
   }
 
@@ -51,4 +51,4 @@ export class Config {
   // }
 }
 
-export const config = new Config()
+export const config = new Config();

@@ -1,51 +1,51 @@
-import React from 'react'
-import {Button, Checkbox, Col, Form, Input, InputNumber, Modal, Radio, Row, Space, Typography} from 'antd'
-import {observer} from 'mobx-react'
-import {MyScrollView} from '../component/ScrollView'
-import {config} from '../store/Config'
-import electronApi from '../electronApi'
-import {download, upload} from '../store'
-import {TaskStatus} from '../store/AbstractTask'
-import {calculate} from '../store/Calculate'
-import {byteToSize} from '../../common/util'
+import React from "react";
+import { Button, Checkbox, Col, Form, Input, InputNumber, Modal, Radio, Row, Space, Typography } from "antd";
+import { observer } from "mobx-react";
+import { MyScrollView } from "../component/ScrollView";
+import { config } from "../store/Config";
+import electronApi from "../electronApi";
+import { download, upload } from "../store";
+import { TaskStatus } from "../store/AbstractTask";
+import { calculate } from "../store/Calculate";
+import { byteToSize } from "../../common/util";
 
 const Setting = observer(() => {
   return (
-    <MyScrollView style={{paddingTop: 60, paddingLeft: 30}}>
-      <Form labelAlign={'left'} colon={false} labelCol={{flex: '100px', style: {fontWeight: 'bold'}}}>
+    <MyScrollView style={{ paddingTop: 60, paddingLeft: 30 }}>
+      <Form labelAlign={"left"} colon={false} labelCol={{ flex: "100px", style: { fontWeight: "bold" } }}>
         {/*todo:*/}
-        <Form.Item label={'统计'}>
-          <Button title={'暂未开放'} type={'link'} disabled>
+        <Form.Item label={"统计"}>
+          <Button title={"暂未开放"} type={"link"} disabled>
             查看
           </Button>
         </Form.Item>
-        <Form.Item label={'外观'}>
+        <Form.Item label={"外观"}>
           <Radio.Group
             defaultValue={config.themeSource}
             onChange={async e => {
-              const theme = await electronApi.setTheme(e.target.value)
-              config.themeSource = theme.themeSource
+              const theme = await electronApi.setTheme(e.target.value);
+              config.themeSource = theme.themeSource;
             }}
           >
-            <Radio.Button value={'light'}>浅色</Radio.Button>
-            <Radio.Button value={'dark'}>深色</Radio.Button>
-            <Radio.Button value={'system'}>跟随系统</Radio.Button>
+            <Radio.Button value={"light"}>浅色</Radio.Button>
+            <Radio.Button value={"dark"}>深色</Radio.Button>
+            <Radio.Button value={"system"}>跟随系统</Radio.Button>
           </Radio.Group>
         </Form.Item>
-        <Form.Item label={'下载位置'} wrapperCol={{flex: '400px'}}>
+        <Form.Item label={"下载位置"} wrapperCol={{ flex: "400px" }}>
           <Row>
             <Col flex={1}>
               <SelectDownloadDir />
             </Col>
             <Col>
-              <Button type={'link'} onClick={() => electronApi.openPath(config.downloadDir)}>
+              <Button type={"link"} onClick={() => electronApi.openPath(config.downloadDir)}>
                 打开
               </Button>
             </Col>
           </Row>
         </Form.Item>
-        <Form.Item label={'同时任务数'}>
-          <Space direction={'vertical'}>
+        <Form.Item label={"同时任务数"}>
+          <Space direction={"vertical"}>
             <Space>
               <InputNumber
                 keyboard
@@ -55,7 +55,7 @@ const Setting = observer(() => {
                 onChange={value => (config.uploadMax = value)}
               />
               上传（1 - 3）
-              <Typography.Text type={'secondary'}>不建议修改</Typography.Text>
+              <Typography.Text type={"secondary"}>不建议修改</Typography.Text>
             </Space>
             <Space>
               <InputNumber
@@ -69,12 +69,12 @@ const Setting = observer(() => {
             </Space>
           </Space>
         </Form.Item>
-        <Form.Item label={'上传流量警戒线'}>
+        <Form.Item label={"上传流量警戒线"}>
           <Space>
             <InputNumber
-              style={{width: 88 + 33}}
+              style={{ width: 88 + 33 }}
               min={1}
-              addonAfter={'G'}
+              addonAfter={"G"}
               value={config.uploadWarningSize}
               onChange={value => (config.uploadWarningSize = value)}
             />
@@ -87,20 +87,20 @@ const Setting = observer(() => {
             <span>今日流量 {byteToSize(calculate.getRecordSize())}</span>
           </Space>
         </Form.Item>
-        <Form.Item label={'最后登录'} style={{marginTop: 70}}>
+        <Form.Item label={"最后登录"} style={{ marginTop: 70 }}>
           {config.lastLogin}
         </Form.Item>
-        <Form.Item label={'账号'}>
+        <Form.Item label={"账号"}>
           <Button
             onClick={() => {
               if ([download.list, upload.list].some(value => value.some(task => task.status === TaskStatus.pending))) {
                 Modal.confirm({
-                  content: '有正在上传/下载的任务，是否继续退出？',
-                  okText: '退出',
+                  content: "有正在上传/下载的任务，是否继续退出？",
+                  okText: "退出",
                   onOk: () => electronApi.logout(),
-                })
+                });
               } else {
-                electronApi.logout()
+                electronApi.logout();
               }
             }}
           >
@@ -115,25 +115,25 @@ const Setting = observer(() => {
         </Form.Item>*/}
       </Form>
     </MyScrollView>
-  )
-})
+  );
+});
 
-export default Setting
+export default Setting;
 
 // 选择地址的组件
 export const SelectDownloadDir = observer(() => (
-  <Space direction={'vertical'} style={{width: '100%'}}>
+  <Space direction={"vertical"} style={{ width: "100%" }}>
     <Row gutter={12}>
       <Col flex={1}>
         <Input value={config.downloadDir} />
       </Col>
       <Col>
         <Button
-          type={'link'}
+          type={"link"}
           onClick={async () => {
-            const value = await electronApi.showOpenDialog({properties: ['openDirectory', 'createDirectory']})
+            const value = await electronApi.showOpenDialog({ properties: ["openDirectory", "createDirectory"] });
             if (!value.canceled) {
-              config.downloadDir = value.filePaths[0]
+              config.downloadDir = value.filePaths[0];
             }
           }}
         >
@@ -145,22 +145,22 @@ export const SelectDownloadDir = observer(() => (
       默认此地址为下载路径
     </Checkbox>
   </Space>
-))
+));
 
 // 选择下载地址
 export function getDownloadDir() {
   return new Promise<string>((resolve, reject) => {
     if (config.setDefaultDownloadDir) {
-      resolve(config.downloadDir)
+      resolve(config.downloadDir);
     } else {
       Modal.confirm({
-        title: '选择下载路径',
+        title: "选择下载路径",
         icon: null,
         maskClosable: true,
         content: <SelectDownloadDir />,
         onCancel: () => reject(),
         onOk: () => resolve(config.downloadDir),
-      })
+      });
     }
-  })
+  });
 }

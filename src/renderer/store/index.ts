@@ -1,68 +1,68 @@
-import {configure} from 'mobx'
-import {create} from 'mobx-persist'
-import {Upload} from './Upload'
-import {Download} from './Download'
-import {TaskStatus} from './AbstractTask'
-import {config} from './Config'
-import store from '../../common/store'
-import electronApi from '../electronApi'
-import {UploadTask} from './task/UploadTask'
-import {DownloadTask} from './task/DownloadTask'
-import {finish} from './Finish'
-import {SyncTask} from './task/SyncTask'
+import { configure } from "mobx";
+import { create } from "mobx-persist";
+import { Upload } from "./Upload";
+import { Download } from "./Download";
+import { TaskStatus } from "./AbstractTask";
+import { config } from "./Config";
+import store from "../../common/store";
+import electronApi from "../electronApi";
+import { UploadTask } from "./task/UploadTask";
+import { DownloadTask } from "./task/DownloadTask";
+import { finish } from "./Finish";
+import { SyncTask } from "./task/SyncTask";
 
 configure({
-  enforceActions: 'never',
-})
+  enforceActions: "never",
+});
 
 export const hydrate = create({
   storage: localStorage,
   debounce: 200,
-})
+});
 
-export const upload = new Upload()
-export const download = new Download()
+export const upload = new Upload();
+export const download = new Download();
 
-function makePause<T extends {tasks: {status: TaskStatus}[]}>(task: T) {
+function makePause<T extends { tasks: { status: TaskStatus }[] }>(task: T) {
   task.tasks.forEach(task => {
     if (task.status === TaskStatus.pending) {
-      task.status = TaskStatus.pause
+      task.status = TaskStatus.pause;
     }
-    return task
-  })
-  return task
+    return task;
+  });
+  return task;
 }
 
 // 合理做法：合并完再初始化的，但目前没遇到什么问题
-hydrate('download', download, (window as any).__STATE__?.download).then(value => {
+hydrate("download", download, (window as any).__STATE__?.download).then(value => {
   value.list = value.list.map(item => {
-    const task = makePause(item)
-    return new DownloadTask(task)
-  })
-})
-hydrate('upload', upload, (window as any).__STATE__?.upload).then(value => {
+    const task = makePause(item);
+    return new DownloadTask(task);
+  });
+});
+hydrate("upload", upload, (window as any).__STATE__?.upload).then(value => {
   value.list = value.list.map(item => {
-    const task = makePause(item)
-    return new UploadTask(task)
-  })
-})
+    const task = makePause(item);
+    return new UploadTask(task);
+  });
+});
 
-hydrate('config', config, (window as any).__STATE__?.config).then(async value => {
+hydrate("config", config, (window as any).__STATE__?.config).then(async value => {
   if (!value.downloadDir) {
-    value.downloadDir = store.get('downloads')
+    value.downloadDir = store.get("downloads");
   }
 
   // 同步软件外观
-  const theme = await electronApi.getTheme()
+  const theme = await electronApi.getTheme();
   if (!value.themeSource) {
-    value.themeSource = theme.themeSource
+    value.themeSource = theme.themeSource;
   } else if (value.themeSource !== theme.themeSource) {
-    await electronApi.setTheme(value.themeSource)
+    await electronApi.setTheme(value.themeSource);
   }
-})
+});
 
-hydrate('finish', finish).then(value => {
-  value.downloadList = value.downloadList.map(item => new DownloadTask(item))
-  value.uploadList = value.uploadList.map(item => new UploadTask(item))
-  value.syncList = value.syncList.map(item => new SyncTask(item))
-})
+hydrate("finish", finish).then(value => {
+  value.downloadList = value.downloadList.map(item => new DownloadTask(item));
+  value.uploadList = value.uploadList.map(item => new UploadTask(item));
+  value.syncList = value.syncList.map(item => new SyncTask(item));
+});

@@ -3,7 +3,7 @@
  */
 export const api = {
   logout: async () => {},
-}
-;(global as any).api = api
+};
+(global as any).api = api;
 
 // contextBridge.exposeInMainWorld('api', api)

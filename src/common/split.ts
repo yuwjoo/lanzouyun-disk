@@ -1,6 +1,6 @@
-import {createSpecificIndexName, getSuffix, sizeToByte} from './util'
+import { createSpecificIndexName, getSuffix, sizeToByte } from "./util";
 
-import type {UploadFile} from '../renderer/store/task/UploadTask'
+import type { UploadFile } from "../renderer/store/task/UploadTask";
 
 // interface SplitData {
 //   path: string
@@ -88,35 +88,35 @@ function split(filePath, {splitSize = config.splitSize, fileSize, skipSplit} = {
 */
 
 export interface SplitTaskResult {
-  file: UploadFile
-  splitFiles: SplitTaskFile[]
+  file: UploadFile;
+  splitFiles: SplitTaskFile[];
 }
 
 export interface SplitTaskFile {
-  sourceFile: UploadFile
-  size: number
-  name: string
-  startByte?: number
-  endByte?: number
+  sourceFile: UploadFile;
+  size: number;
+  name: string;
+  startByte?: number;
+  endByte?: number;
 }
 
 export interface SplitTaskOptions {
-  file: UploadFile
-  splitSize: string
-  filename?: string
-  suffix?: string
+  file: UploadFile;
+  splitSize: string;
+  filename?: string;
+  suffix?: string;
 }
 
 /**
  * 返回文件分割信息（不进行文件分割）
  */
 export function splitTask(options: SplitTaskOptions): SplitTaskResult {
-  const fSize = options.file.size
-  const splitByte = sizeToByte(options.splitSize)
+  const fSize = options.file.size;
+  const splitByte = sizeToByte(options.splitSize);
 
-  const file = options.file
-  const filename = options.filename || file.name
-  const info: SplitTaskResult = {file, splitFiles: []}
+  const file = options.file;
+  const filename = options.filename || file.name;
+  const info: SplitTaskResult = { file, splitFiles: [] };
 
   if (fSize <= splitByte) {
     info.splitFiles = [
@@ -125,23 +125,23 @@ export function splitTask(options: SplitTaskOptions): SplitTaskResult {
         size: file.size,
         name: filename,
       },
-    ]
+    ];
   } else {
-    const count = Math.ceil(fSize / splitByte)
-    const suffix = options.suffix || getSuffix()
-    info.splitFiles = Array.from({length: count}).map((_, i) => {
-      const indexName = createSpecificIndexName(filename, suffix, i + 1, count)
-      const startByte = splitByte * i
-      const endByte = Math.min(fSize, splitByte * (i + 1) - 1)
+    const count = Math.ceil(fSize / splitByte);
+    const suffix = options.suffix || getSuffix();
+    info.splitFiles = Array.from({ length: count }).map((_, i) => {
+      const indexName = createSpecificIndexName(filename, suffix, i + 1, count);
+      const startByte = splitByte * i;
+      const endByte = Math.min(fSize, splitByte * (i + 1) - 1);
       return {
         sourceFile: file,
         size: endByte - startByte,
         name: indexName,
         startByte,
         endByte,
-      }
-    })
+      };
+    });
   }
 
-  return info
+  return info;
 }

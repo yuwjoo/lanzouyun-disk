@@ -1,5 +1,5 @@
 interface IpcDownloadMsg {
-  downUrl: string
+  downUrl: string;
 
   /**
    * `start${replyId}`
@@ -9,6 +9,6 @@ interface IpcDownloadMsg {
    // * `pause${replyId}`
    // * `interrupted${replyId}`
    */
-  replyId: string
-  folderPath?: string
+  replyId: string;
+  folderPath?: string;
 }

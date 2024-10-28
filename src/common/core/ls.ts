@@ -1,13 +1,13 @@
-import cheerio from 'cheerio'
-import type {Cheerio} from 'cheerio'
-import {byteToSize, delay, sizeToByte} from '../util'
-import {Matcher} from './matcher'
-import * as http from '../http'
-import {config} from '../../renderer/store/Config'
+import cheerio from "cheerio";
+import type { Cheerio } from "cheerio";
+import { byteToSize, delay, sizeToByte } from "../util";
+import { Matcher } from "./matcher";
+import * as http from "../http";
+import { config } from "../../renderer/store/Config";
 
 export enum URLType {
-  file = 'file', // https://wws.lanzous.com/ivvHsi3qyef
-  folder = 'folder', // https://wws.lanzous.com/b01tp3zkj
+  file = "file", // https://wws.lanzous.com/ivvHsi3qyef
+  folder = "folder", // https://wws.lanzous.com/b01tp3zkj
 }
 
 /**
@@ -18,20 +18,20 @@ export enum URLType {
  * ls https://xxxx/xxxx --pwd 123 // url, pwd
  */
 export interface LsFiles {
-  name: string
-  type: URLType
-  id: string // 文件id 或者 文件夹id
+  name: string;
+  type: URLType;
+  id: string; // 文件id 或者 文件夹id
 
-  icon?: string // 从 source 里面拿
-  size?: string
-  time?: string
-  downs?: string
-  source: FileInfo | FolderInfo
+  icon?: string; // 从 source 里面拿
+  size?: string;
+  time?: string;
+  downs?: string;
+  source: FileInfo | FolderInfo;
 }
 
 export interface LsResult {
-  info: CrumbsInfo[]
-  text: LsFiles[]
+  info: CrumbsInfo[];
+  text: LsFiles[];
 }
 
 /**
@@ -40,14 +40,14 @@ export interface LsResult {
  * @param folderFirst 文件夹优先 true
  */
 export async function ls(folder_id: FolderId = -1, folderFirst = true): Promise<LsResult> {
-  const [res1, res2] = await Promise.all([lsDir(folder_id), lsFile(folder_id)])
+  const [res1, res2] = await Promise.all([lsDir(folder_id), lsFile(folder_id)]);
 
   const folders = res1.text.map(value => ({
     name: value.name,
     type: URLType.folder,
     id: `${value.fol_id}`,
     source: value,
-  }))
+  }));
   const files = res2.map(value => ({
     name: value.name_all,
     type: URLType.file,
@@ -57,12 +57,12 @@ export async function ls(folder_id: FolderId = -1, folderFirst = true): Promise<
     time: value.time,
     downs: value.downs,
     source: value,
-  }))
+  }));
 
   return {
     info: res1.info,
     text: folderFirst ? [...folders, ...files] : [...files, ...folders],
-  }
+  };
 }
 
 /**
@@ -70,23 +70,23 @@ export async function ls(folder_id: FolderId = -1, folderFirst = true): Promise<
  * cookie
  */
 export async function lsFile(folder_id: FolderId) {
-  let pg = 1
-  let next = true
-  const fileList: Task5Res['text'] = []
+  let pg = 1;
+  let next = true;
+  const fileList: Task5Res["text"] = [];
   do {
-    const {text} = await http.request
-      .post(config.more.url?.replace(/^\//, ''), {
-        form: {task: 5, folder_id, pg: pg++, vei: config.more.data?.vei} as Task5,
+    const { text } = await http.request
+      .post(config.more.url?.replace(/^\//, ""), {
+        form: { task: 5, folder_id, pg: pg++, vei: config.more.data?.vei } as Task5,
       })
-      .json<Task5Res>()
+      .json<Task5Res>();
     // todo: 蓝奏分页数量：api：18，分享页：50
-    next = Array.isArray(text) && text.length >= 18
+    next = Array.isArray(text) && text.length >= 18;
     if (Array.isArray(text)) {
-      fileList.push(...text)
+      fileList.push(...text);
     }
-  } while (next)
+  } while (next);
 
-  return fileList
+  return fileList;
 }
 
 /**
@@ -94,22 +94,22 @@ export async function lsFile(folder_id: FolderId) {
  * cookie
  */
 export async function lsDir(folder_id: FolderId) {
-  return http.request.post('doupload.php', {form: {task: 47, folder_id} as Task47}).json<Task47Res>()
+  return http.request.post("doupload.php", { form: { task: 47, folder_id } as Task47 }).json<Task47Res>();
 }
 
 export interface LsShareObject {
-  name: string
-  size: string
-  type: URLType
-  list: LsShareItem[]
+  name: string;
+  size: string;
+  type: URLType;
+  list: LsShareItem[];
 }
 
 export interface LsShareItem {
-  url: string // 如果文件有密码，则带有 webpage 参数
-  name: string
-  size: string
-  time: string
-  pwd?: string
+  url: string; // 如果文件有密码，则带有 webpage 参数
+  name: string;
+  size: string;
+  time: string;
+  pwd?: string;
 }
 
 /**
@@ -120,66 +120,66 @@ export interface LsShareItem {
  * * 无密码: #filemore; title
  * * 密码: #pwdload
  */
-export async function lsShare({url, pwd}: {url: string; pwd?: string}): Promise<LsShareObject> {
-  const instance = http.share.get(url)
-  const response = await instance
-  const html = await instance.text()
+export async function lsShare({ url, pwd }: { url: string; pwd?: string }): Promise<LsShareObject> {
+  const instance = http.share.get(url);
+  const response = await instance;
+  const html = await instance.text();
   // 覆盖原url（防url重定向）
-  url = response.url
+  url = response.url;
 
-  const $ = cheerio.load(html)
+  const $ = cheerio.load(html);
 
   // 根据html区分哪种解析类型
-  const isFile = !!$('iframe').length
-  const isPwdFile = !!$('#passwddiv').length
-  const isPwdFolder = !!$('#pwdload').length
-  const isFolder = !!$('#filemore').length && !isPwdFolder // 密码和无密码页面
+  const isFile = !!$("iframe").length;
+  const isPwdFile = !!$("#passwddiv").length;
+  const isPwdFolder = !!$("#pwdload").length;
+  const isFolder = !!$("#filemore").length && !isPwdFolder; // 密码和无密码页面
 
   if ((isPwdFile || isPwdFolder) && !pwd) {
-    throw new Error('密码不能为空')
+    throw new Error("密码不能为空");
   }
 
-  const title = $('title').text()
+  const title = $("title").text();
   if (isFile) {
-    const name = title.replace(' - 蓝奏云', '') // '(文件名) - 蓝奏云',
-    const size = $('meta[name=description]').attr('content').split('|')[0].replace('文件大小：', '')
+    const name = title.replace(" - 蓝奏云", ""); // '(文件名) - 蓝奏云',
+    const size = $("meta[name=description]").attr("content").split("|")[0].replace("文件大小：", "");
 
-    let time = html.match(/上传时间：<\/span>(.*?)<br>/)?.[1]
+    let time = html.match(/上传时间：<\/span>(.*?)<br>/)?.[1];
     if (!time) {
       // https://xiaodao.lanzoui.com/iejwp06dnwyj
-      let fileInfos: Cheerio<any> = null
-      if ((fileInfos = $('.n_file_info > .n_file_infos')) && fileInfos.length > 1) {
-        time = fileInfos.first().text()
+      let fileInfos: Cheerio<any> = null;
+      if ((fileInfos = $(".n_file_info > .n_file_infos")) && fileInfos.length > 1) {
+        time = fileInfos.first().text();
       }
     }
     if (!time) {
       // https://dkbd.lanzoui.com/dkbdv7
-      const src = $('.filename img').attr('src')
+      const src = $(".filename img").attr("src");
       if (src) {
         time = new URL(src).pathname
-          .split('/')
+          .split("/")
           .filter(value => /^\d+$/.test(value))
-          .join('-')
+          .join("-");
       }
     }
-    return {name, size, type: URLType.file, list: [{url, name, size, time}]}
+    return { name, size, type: URLType.file, list: [{ url, name, size, time }] };
   } else if (isPwdFile) {
-    const ajaxData = await Matcher.parsePwdAjax(html, pwd)
+    const ajaxData = await Matcher.parsePwdAjax(html, pwd);
 
-    const {inf} = await http
+    const { inf } = await http
       .share(new URL(ajaxData.url, url), {
         method: ajaxData.type,
-        headers: {referer: url},
+        headers: { referer: url },
         form: ajaxData.data,
-        context: {hideMessage: true},
+        context: { hideMessage: true },
       })
-      .json<DownloadUrlRes>()
-    const name = inf // 文件名
-    const size = $('meta[name=description]').attr('content').split('|')[0].replace('文件大小：', '')
-    const time = $('.n_file_info > .n_file_infos:first-child').text()
-    return {name, size, type: URLType.file, list: [{url, pwd, name, size, time}]}
+      .json<DownloadUrlRes>();
+    const name = inf; // 文件名
+    const size = $("meta[name=description]").attr("content").split("|")[0].replace("文件大小：", "");
+    const time = $(".n_file_info > .n_file_infos:first-child").text();
+    return { name, size, type: URLType.file, list: [{ url, pwd, name, size, time }] };
   } else if (isFolder || isPwdFolder) {
-    const value = await _lsShareFolder({pwd, url, html})
+    const value = await _lsShareFolder({ pwd, url, html });
     return {
       name: title, // (文件夹名)
       type: URLType.folder,
@@ -190,11 +190,11 @@ export async function lsShare({url, pwd}: {url: string; pwd?: string}): Promise<
         size: item.size,
         time: item.time,
       })),
-    }
+    };
   } else {
     // 解析错误: https://hzgzs.lanzoui.com/s/iv1hxrmbpgb
-    const errorMsg = $('.off').text() || `解析错误：${url}`
-    throw new Error(errorMsg)
+    const errorMsg = $(".off").text() || `解析错误：${url}`;
+    throw new Error(errorMsg);
   }
 }
 
@@ -203,42 +203,42 @@ export async function lsShare({url, pwd}: {url: string; pwd?: string}): Promise<
  * 发送 ajax，如有密码，则带上 pwd
  * @param options
  */
-async function _lsShareFolder({url, pwd, html}: {url: string; pwd?: string; html?: string}) {
+async function _lsShareFolder({ url, pwd, html }: { url: string; pwd?: string; html?: string }) {
   if (!html) {
-    const instance = http.share.get(url)
-    const response = await instance
-    url = response.url
-    html = await instance.text()
+    const instance = http.share.get(url);
+    const response = await instance;
+    url = response.url;
+    html = await instance.text();
   }
 
-  const $ = cheerio.load(html)
-  const title = $('title').text()
+  const $ = cheerio.load(html);
+  const title = $("title").text();
 
-  const ajaxData = await Matcher.parseFolderAjax(html)
+  const ajaxData = await Matcher.parseFolderAjax(html);
 
-  let pg = 1
-  const shareFiles: ShareFile[] = []
+  let pg = 1;
+  const shareFiles: ShareFile[] = [];
 
   while (true) {
-    const {text} = await http
+    const { text } = await http
       .share(new URL(ajaxData.url, url), {
         method: ajaxData.type,
-        headers: {referer: url},
-        form: {...ajaxData.data, pg: pg++, pwd},
-        context: {hideMessage: true},
+        headers: { referer: url },
+        form: { ...ajaxData.data, pg: pg++, pwd },
+        context: { hideMessage: true },
       })
-      .json<ShareFileRes>()
+      .json<ShareFileRes>();
 
     if (Array.isArray(text)) {
-      shareFiles.push(...text)
+      shareFiles.push(...text);
     }
 
     if (Array.isArray(text) && text.length >= 50) {
-      await delay(2000)
+      await delay(2000);
     } else {
-      break
+      break;
     }
   }
 
-  return {name: title, list: shareFiles}
+  return { name: title, list: shareFiles };
 }

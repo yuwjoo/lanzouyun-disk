@@ -7,27 +7,27 @@ export enum TaskStatus {
 }
 
 export const TaskStatusName = {
-  [TaskStatus.ready]: '等待中',
-  [TaskStatus.pause]: '已暂停',
-  [TaskStatus.pending]: '进行中',
-  [TaskStatus.finish]: '已完成',
-  [TaskStatus.fail]: '失败',
-}
+  [TaskStatus.ready]: "等待中",
+  [TaskStatus.pause]: "已暂停",
+  [TaskStatus.pending]: "进行中",
+  [TaskStatus.finish]: "已完成",
+  [TaskStatus.fail]: "失败",
+};
 
 export default interface Task<Info> {
-  readonly queue: number
+  readonly queue: number;
 
-  list: Info[]
+  list: Info[];
 
-  start(...args)
+  start(...args);
 
-  startAll()
+  startAll();
 
-  pause(...args)
+  pause(...args);
 
-  pauseAll()
+  pauseAll();
 
-  remove(...args)
+  remove(...args);
 
-  removeAll()
+  removeAll();
 }
